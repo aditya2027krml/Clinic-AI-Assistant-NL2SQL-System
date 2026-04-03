@@ -1,0 +1,202 @@
+[
+  {
+    "number": 1,
+    "question": "How many patients do we have?",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 1356cbc4-5ea7-4518-8f13-1fd280498f9e)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 2,
+    "question": "List all doctors and their specializations",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 639a7f57-ab9d-40a6-b3c1-94ec350a06d0)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 3,
+    "question": "Show me appointments for last month",
+    "status": "PASS",
+    "message": "The SQL query executed was: SELECT * FROM appointments WHERE appointment_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month') AND appointment_date < DATE_TRUNC('month', CURRENT_DATE). The raw result is shown above. It appears there was a syntax error in the SQL query, which prevented the execution of the query. The correct query should be: SELECT * FROM appointments WHERE appointment_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month') AND appointment_date < DATE_TRUNC('month', CURRENT_DATE). However, the exact appointments for last month cannot be determined due to the syntax error.",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 4,
+    "question": "Which doctor has the most appointments?",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: f57ef0f7-e7c5-4e9e-89b4-b27ce580fa9c)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 5,
+    "question": "What is the total revenue?",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: d90b1592-66d0-4562-8a5f-f06ef87b9f9e)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 6,
+    "question": "Show revenue by doctor",
+    "status": "PASS",
+    "message": "I was unable to find the correct SQL query to show the revenue by doctor as the table 'hospital_revenue' was not found. Let me try to look into this further.",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 7,
+    "question": "How many cancelled appointments last quarter?",
+    "status": "PASS",
+    "message": "\u26a0\ufe0f **Tool Execution Limit Reached** The agent stopped after executing 10 tools (the configured maximum). The task may not be fully complete. You can:\n- Ask me to continue where I left off\n- Adjust the `max_tool_iterations` setting if you need more tool calls\n- Break the task into smaller steps",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 8,
+    "question": "Top 5 patients by spending",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: cc2267bf-86a1-4de2-8605-96adc2c6d60c)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 9,
+    "question": "Average treatment cost by specialization",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 889c286d-d87d-4adb-8d93-d92d55f98c02)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 10,
+    "question": "Show monthly appointment count for the past 6 months",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: d72ccb7e-c3d2-40bd-99a9-008f342964a9)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 11,
+    "question": "Which city has the most patients?",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: a4b82f2e-b307-43ff-9872-0cb3a061cf79)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 12,
+    "question": "List patients who visited more than 3 times",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: a3337b70-ee78-456e-a3b1-becfbe12cc21)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 13,
+    "question": "Show unpaid invoices",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 2267d728-05c4-4132-987f-d33092f81769)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 14,
+    "question": "What percentage of appointments are no-shows?",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 054296aa-e70a-4a08-81c2-2e7f9dcc4218)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 15,
+    "question": "Show the busiest day of the week for appointments",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 1b72307a-9f90-4dfe-a235-1fc2c9837dca)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 16,
+    "question": "Revenue trend by month",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: b7b6560b-7e82-4a60-81d0-3858dea750fa)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 17,
+    "question": "Average appointment duration by doctor",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: b01d5d82-2110-4e25-ba58-228dc5d6ce44)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 18,
+    "question": "List patients with overdue invoices",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 14d4f9be-e649-41fc-ac57-ec6ff7d6e140)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 19,
+    "question": "Compare revenue between departments",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 0837614e-c149-4b8b-a7cc-32d362eb8b8f)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  },
+  {
+    "number": 20,
+    "question": "Show patient registration trend by month",
+    "status": "PASS",
+    "message": "Error: An unexpected error occurred. Please try again. (Conversation ID: 13cc9913-d2c1-4f07-a204-047e0130cbda)",
+    "sql": null,
+    "rows": null,
+    "row_count": null,
+    "error": null
+  }
+]

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clinic AI Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+  :root {
+    --navy:       #0a1628;
+    --blue:       #1a56db;
+    --blue-light: #3b82f6;
+    --blue-pale:  #eff6ff;
+    --teal:       #0d9488;
+    --white:      #ffffff;
+    --gray-50:    #f8fafc;
+    --gray-100:   #f1f5f9;
+    --gray-200:   #e2e8f0;
+    --gray-400:   #94a3b8;
+    --gray-600:   #475569;
+    --gray-800:   #1e293b;
+    --red:        #ef4444;
+    --green:      #10b981;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg:  0 12px 40px rgba(0,0,0,0.13);
+    --radius:     14px;
+    --radius-sm:  8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: var(--blue);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-text span { color: var(--blue); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gray-400);
+  }
+  .status-dot.online { background: var(--green); animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ── LAYOUT ─────────────────────────────── */
+  .layout {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 64px);
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────── */
+  .sidebar {
+    width: 280px;
+    background: var(--white);
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar-section {
+    padding: 20px 20px 8px;
+  }
+
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gray-400);
+    margin-bottom: 12px;
+  }
+
+  .suggestion-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-size: 13px;
+    color: var(--gray-600);
+    cursor: pointer;
+    margin-bottom: 7px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+
+  .suggestion-btn:hover {
+    background: var(--blue-pale);
+    border-color: var(--blue-light);
+    color: var(--blue);
+  }
+
+  .suggestion-btn .s-icon {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--gray-100);
+    margin: 8px 20px;
+  }
+
+  .schema-table {
+    margin: 0 20px 8px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+
+  .schema-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 13px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--gray-100);
+    cursor: default;
+    transition: background 0.12s;
+  }
+
+  .schema-row:last-child { border-bottom: none; }
+  .schema-row:hover { background: var(--gray-50); }
+
+  .schema-row .s-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .schema-row span { color: var(--gray-600); font-size: 12px; margin-left: auto; }
+
+  /* ── MAIN AREA ───────────────────────────── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── CHAT AREA ───────────────────────────── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Welcome screen */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .welcome-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(26,86,219,0.25);
+  }
+
+  .welcome h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--navy);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .welcome p {
+    font-size: 15px;
+    color: var(--gray-600);
+    max-width: 420px;
+    line-height: 1.6;
+  }
+
+  /* Message bubbles */
+  .message { display: flex; flex-direction: column; gap: 6px; animation: slideUp 0.3s ease; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .msg-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--gray-400);
+    padding: 0 4px;
+  }
+
+  .user-message .msg-label { text-align: right; color: var(--blue); }
+
+  .bubble {
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  .user-message { align-items: flex-end; }
+  .user-message .bubble {
+    background: var(--blue);
+    color: var(--white);
+    border-bottom-right-radius: 4px;
+  }
+
+  .ai-message .bubble {
+    background: var(--white);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-200);
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* SQL block */
+  .sql-block {
+    background: var(--navy);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-top: 4px;
+    max-width: 680px;
+  }
+
+  .sql-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sql-header span {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--gray-400);
+  }
+
+  .copy-btn {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s;
+  }
+  .copy-btn:hover { color: var(--white); }
+
+  .sql-code {
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #93c5fd;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  /* Results table */
+  .results-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-width: 780px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+
+  .results-header h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+  }
+
+  .row-count-badge {
+    background: var(--blue-pale);
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .table-wrap { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
+  thead th {
+    background: var(--gray-50);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--gray-600);
+    border-bottom: 2px solid var(--gray-200);
+    position: sticky; top: 0;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--blue-pale); }
+
+  /* Chart */
+  .chart-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-width: 780px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .chart-header {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chart-body { padding: 16px; }
+
+  /* Typing indicator */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 18px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    border-bottom-left-radius: 4px;
+    width: fit-content;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .typing-dot {
+    width: 7px; height: 7px;
+    background: var(--blue-light);
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Error bubble */
+  .error-bubble {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    color: var(--red);
+    font-size: 14px;
+    max-width: 680px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── INPUT AREA ──────────────────────────── */
+  .input-area {
+    padding: 20px 32px 24px;
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.10);
+    background: var(--white);
+  }
+
+  #questionInput {
+    flex: 1;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: var(--gray-800);
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    min-height: 24px;
+    max-height: 120px;
+  }
+
+  #questionInput::placeholder { color: var(--gray-400); }
+
+  #sendBtn {
+    width: 40px; height: 40px;
+    background: var(--blue);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+    color: white;
+    font-size: 18px;
+  }
+
+  #sendBtn:hover { background: #1d4ed8; }
+  #sendBtn:active { transform: scale(0.95); }
+  #sendBtn:disabled { background: var(--gray-200); cursor: not-allowed; }
+
+  .input-hint {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏥</div>
+    <div class="logo-text">Clinic <span>AI</span> Assistant</div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Checking...</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">💡 Try asking</div>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">👥</span>How many patients do we have?
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">👨‍⚕️</span>Which doctor has the most appointments?
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">💰</span>What is the total revenue?
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">📊</span>Show revenue by doctor
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">🏙️</span>Which city has the most patients?
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">📅</span>Show monthly appointment count for the past 6 months
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">⚠️</span>Show unpaid invoices
+      </button>
+      <button class="suggestion-btn" onclick="useSuggestion(this)">
+        <span class="s-icon">🏆</span>Top 5 patients by spending
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">🗄️ Database Tables</div>
+    </div>
+    <div class="schema-table">
+      <div class="schema-row">
+        <div class="s-dot" style="background:#3b82f6"></div>
+        <span style="color:var(--gray-800);font-weight:500">patients</span>
+        <span>200 rows</span>
+      </div>
+      <div class="schema-row">
+        <div class="s-dot" style="background:#10b981"></div>
+        <span style="color:var(--gray-800);font-weight:500">doctors</span>
+        <span>15 rows</span>
+      </div>
+      <div class="schema-row">
+        <div class="s-dot" style="background:#f59e0b"></div>
+        <span style="color:var(--gray-800);font-weight:500">appointments</span>
+        <span>500 rows</span>
+      </div>
+      <div class="schema-row">
+        <div class="s-dot" style="background:#8b5cf6"></div>
+        <span style="color:var(--gray-800);font-weight:500">treatments</span>
+        <span>~350 rows</span>
+      </div>
+      <div class="schema-row">
+        <div class="s-dot" style="background:#ef4444"></div>
+        <span style="color:var(--gray-800);font-weight:500">invoices</span>
+        <span>300 rows</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="chat-area" id="chatArea">
+      <!-- Welcome screen -->
+      <div class="welcome" id="welcomeScreen">
+        <div class="welcome-icon">🏥</div>
+        <h1>Ask your clinic data anything</h1>
+        <p>Type a question in plain English and I'll query the database and show you the results instantly.</p>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea
+          id="questionInput"
+          placeholder="Ask anything about patients, doctors, appointments, revenue..."
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" onclick="sendQuestion()" title="Send (Enter)">➤</button>
+      </div>
+      <div class="input-hint">Press Enter to send · Shift+Enter for new line</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API_URL = 'http://localhost:8000';
+
+  // ── AUTO-RESIZE TEXTAREA ─────────────────
+  const input = document.getElementById('questionInput');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendQuestion();
+    }
+  });
+
+  // ── CHECK SERVER HEALTH ──────────────────
+  async function checkHealth() {
+    try {
+      const res  = await fetch(`${API_URL}/health`);
+      const data = await res.json();
+      const dot  = document.getElementById('statusDot');
+      const txt  = document.getElementById('statusText');
+      if (data.status === 'ok') {
+        dot.classList.add('online');
+        txt.textContent = 'Connected · ' + data.agent_memory_items + ' memories';
+      } else {
+        txt.textContent = 'Server error';
+      }
+    } catch {
+      document.getElementById('statusText').textContent = 'Server offline';
+    }
+  }
+  checkHealth();
+
+  // ── USE SUGGESTION ───────────────────────
+  function useSuggestion(btn) {
+    const text = btn.textContent.trim();
+    input.value = text;
+    input.style.height = 'auto';
+    sendQuestion();
+  }
+
+  // ── SEND QUESTION ────────────────────────
+  async function sendQuestion() {
+    const question = input.value.trim();
+    if (!question) return;
+
+    // Hide welcome screen
+    const welcome = document.getElementById('welcomeScreen');
+    if (welcome) welcome.remove();
+
+    // Disable input
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('sendBtn').disabled = true;
+
+    const chatArea = document.getElementById('chatArea');
+
+    // Add user message
+    chatArea.appendChild(createUserMessage(question));
+
+    // Add typing indicator
+    const typingEl = createTypingIndicator();
+    chatArea.appendChild(typingEl);
+    scrollToBottom();
+
+    try {
+      const res  = await fetch(`${API_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+
+      // Remove typing indicator
+      typingEl.remove();
+
+      // Add AI response
+      chatArea.appendChild(createAIResponse(data, question));
+
+    } catch (err) {
+      typingEl.remove();
+      chatArea.appendChild(createErrorMessage('Could not reach the server. Make sure it is running on port 8000.'));
+    }
+
+    document.getElementById('sendBtn').disabled = false;
+    scrollToBottom();
+    input.focus();
+  }
+
+  // ── CREATE USER MESSAGE ──────────────────
+  function createUserMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'message user-message';
+    div.innerHTML = `
+      <div class="msg-label">You</div>
+      <div class="bubble">${escHtml(text)}</div>
+    `;
+    return div;
+  }
+
+  // ── CREATE AI RESPONSE ───────────────────
+  function createAIResponse(data, question) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'message ai-message';
+    wrapper.innerHTML = `<div class="msg-label">AI Assistant</div>`;
+
+    // Main message bubble
+    if (data.message) {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = data.message;
+      wrapper.appendChild(bubble);
+    }
+
+    // SQL block
+    if (data.sql_query) {
+      const sqlEl = document.createElement('div');
+      sqlEl.className = 'sql-block';
+      const sqlId = 'sql_' + Date.now();
+      sqlEl.innerHTML = `
+        <div class="sql-header">
+          <span>🔍 Generated SQL</span>
+          <button class="copy-btn" onclick="copySQL('${sqlId}')">Copy</button>
+        </div>
+        <div class="sql-code" id="${sqlId}">${escHtml(data.sql_query)}</div>
+      `;
+      wrapper.appendChild(sqlEl);
+    }
+
+    // Results table
+    if (data.rows && data.rows.length > 0) {
+      wrapper.appendChild(createTable(data.columns, data.rows, data.row_count));
+
+      // Auto-generate chart if more than 1 row
+      if (data.rows.length > 1) {
+        wrapper.appendChild(createChart(data.columns, data.rows, question));
+      }
+    }
+
+    // Error
+    if (data.error) {
+      const errEl = document.createElement('div');
+      errEl.className = 'error-bubble';
+      errEl.innerHTML = `⚠️ ${escHtml(data.error)}`;
+      wrapper.appendChild(errEl);
+    }
+
+    return wrapper;
+  }
+
+  // ── CREATE TABLE ─────────────────────────
+  function createTable(columns, rows, rowCount) {
+    const card = document.createElement('div');
+    card.className = 'results-card';
+
+    const cols = columns || Object.keys(rows[0]);
+
+    let thead = cols.map(c => `<th>${escHtml(String(c))}</th>`).join('');
+    let tbody = rows.map(row =>
+      '<tr>' + cols.map(c => `<td>${escHtml(String(row[c] ?? ''))}</td>`).join('') + '</tr>'
+    ).join('');
+
+    card.innerHTML = `
+      <div class="results-header">
+        <h4>📋 Query Results</h4>
+        <span class="row-count-badge">${rowCount} row${rowCount !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>${thead}</tr></thead>
+          <tbody>${tbody}</tbody>
+        </table>
+      </div>
+    `;
+    return card;
+  }
+
+  // ── CREATE CHART ─────────────────────────
+  function createChart(columns, rows, question) {
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const chartId = 'chart_' + Date.now();
+
+    card.innerHTML = `
+      <div class="chart-header">📈 Visualization</div>
+      <div class="chart-body"><div id="${chartId}" style="width:100%;height:300px"></div></div>
+    `;
+
+    // Build chart after element is in DOM
+    setTimeout(() => {
+      const cols = columns || Object.keys(rows[0]);
+      if (cols.length < 2) return;
+
+      const xCol = cols[0];
+      const yCol = cols[1];
+
+      const xVals = rows.map(r => r[xCol]);
+      const yVals = rows.map(r => parseFloat(r[yCol]) || 0);
+
+      // Decide bar vs line
+      const isTimeSeries = question.toLowerCase().includes('month') ||
+                           question.toLowerCase().includes('trend') ||
+                           question.toLowerCase().includes('over time');
+
+      const trace = {
+        x: xVals,
+        y: yVals,
+        type: isTimeSeries ? 'scatter' : 'bar',
+        mode: isTimeSeries ? 'lines+markers' : undefined,
+        marker: { color: '#1a56db', opacity: 0.85 },
+        line: { color: '#1a56db', width: 2.5 },
+        name: yCol,
+      };
+
+      const layout = {
+        margin: { t: 10, r: 20, b: 60, l: 60 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { family: 'DM Sans, sans-serif', size: 12, color: '#475569' },
+        xaxis: { tickangle: -30, gridcolor: '#f1f5f9' },
+        yaxis: { gridcolor: '#f1f5f9' },
+        showlegend: false,
+      };
+
+      Plotly.newPlot(chartId, [trace], layout, { responsive: true, displayModeBar: false });
+    }, 100);
+
+    return card;
+  }
+
+  // ── TYPING INDICATOR ─────────────────────
+  function createTypingIndicator() {
+    const div = document.createElement('div');
+    div.className = 'message ai-message';
+    div.innerHTML = `
+      <div class="msg-label">AI Assistant</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    `;
+    return div;
+  }
+
+  // ── ERROR MESSAGE ─────────────────────────
+  function createErrorMessage(msg) {
+    const div = document.createElement('div');
+    div.className = 'message ai-message';
+    div.innerHTML = `
+      <div class="msg-label">AI Assistant</div>
+      <div class="error-bubble">⚠️ ${escHtml(msg)}</div>
+    `;
+    return div;
+  }
+
+  // ── COPY SQL ──────────────────────────────
+  function copySQL(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      event.target.textContent = 'Copied!';
+      setTimeout(() => event.target.textContent = 'Copy', 1500);
+    });
+  }
+
+  // ── HELPERS ───────────────────────────────
+  function scrollToBottom() {
+    const area = document.getElementById('chatArea');
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
